@@ -14,6 +14,7 @@ type Repository interface {
 	GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, error)
 	AddTravel(ctx *fiber.Ctx, travel *models.Travel) error
 	EditTravel(ctx *fiber.Ctx, id string, data interface{}) error
+	DeleteTravel(ctx *fiber.Ctx, id string) error
 }
 
 type repository struct {
@@ -69,13 +70,27 @@ func (r *repository) AddTravel(ctx *fiber.Ctx, travel *models.Travel) error {
 func (r *repository) EditTravel(ctx *fiber.Ctx, id string, data interface{}) error {
 
 	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	query := bson.M{"_id": objectId}
 
 	if result := r.DB.Collection("travels").FindOneAndUpdate(ctx.Context(), query, data); result.Err() != nil {
 		return result.Err()
+	}
+	return nil
+}
+
+func (r *repository) DeleteTravel(ctx *fiber.Ctx, id string) error {
+
+	objectId, err := primitive.ObjectIDFromHex(id); 
+	if err != nil {
+		return err
+	}
+	query := bson.M{"_id": objectId}
+
+	if _, err := r.DB.Collection("travels").DeleteOne(ctx.Context(), query); err != nil {
+		return err
 	}
 	return nil
 }

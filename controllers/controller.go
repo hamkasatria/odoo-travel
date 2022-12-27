@@ -108,3 +108,15 @@ func (c *controller) EditTravel(ctx *fiber.Ctx) error {
 	transports.JsonResponse(ctx, fiber.StatusOK, nil)
 	return nil
 }
+
+func (c *controller) DeleteTravel(ctx *fiber.Ctx) error {
+	id := ctx.Params("ObjectId")
+
+	if err := c.srv.DeleteTravel(ctx, id); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
+		return nil
+	}
+
+	transports.JsonResponse(ctx, fiber.StatusOK, nil)
+	return nil
+}

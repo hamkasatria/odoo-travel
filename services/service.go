@@ -13,6 +13,7 @@ type Services interface {
 	GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, error)
 	AddTravel(ctx *fiber.Ctx, travel *models.Travel) error
 	EditTravel(ctx *fiber.Ctx, id string, travel *models.Travel) error
+	DeleteTravel(ctx *fiber.Ctx, id string) error
 }
 
 type services struct {
@@ -63,6 +64,14 @@ func (s *services) EditTravel(ctx *fiber.Ctx, id string, travel *models.Travel) 
 	}
 
 	if err := s.repo.EditTravel(ctx, id, update); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *services) DeleteTravel(ctx *fiber.Ctx, id string) error {
+	if err := s.repo.DeleteTravel(ctx, id); err != nil {
 		return err
 	}
 
