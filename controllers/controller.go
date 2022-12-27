@@ -82,3 +82,29 @@ func (c *controller) AddTravel(ctx *fiber.Ctx) error {
 	transports.JsonResponse(ctx, fiber.StatusOK, nil)
 	return nil
 }
+
+func (c *controller) EditTravel(ctx *fiber.Ctx) error {
+	id := ctx.Params("ObjectId")
+	travel := new(transports.UpdateTravel)
+
+	if err := ctx.BodyParser(travel); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusBadRequest, err.Error())
+		return err
+	}
+
+	if err := c.validator.Struct(travel); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusBadRequest, err.Error())
+		return nil
+	}
+
+	if err := c.srv.EditTravel(ctx, id, &models.Travel{
+		Name:    travel.Name,
+		Contact: travel.Contact,
+	}); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
+		return nil
+	}
+
+	transports.JsonResponse(ctx, fiber.StatusOK, nil)
+	return nil
+}

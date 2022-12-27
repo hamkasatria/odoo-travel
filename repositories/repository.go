@@ -12,7 +12,8 @@ import (
 type Repository interface {
 	GetListTravels(ctx *fiber.Ctx) (*[]models.Travel, error)
 	GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, error)
-	AddTravel(ctx *fiber.Ctx, travel *models.Travel)  error
+	AddTravel(ctx *fiber.Ctx, travel *models.Travel) error
+	EditTravel(ctx *fiber.Ctx, id string, data interface{}) error
 }
 
 type repository struct {
@@ -56,11 +57,25 @@ func (r *repository) GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, e
 	return &travel, nil
 }
 
-func (r *repository) AddTravel(ctx *fiber.Ctx, travel *models.Travel)  error {
+func (r *repository) AddTravel(ctx *fiber.Ctx, travel *models.Travel) error {
 
 	if _, err := r.DB.Collection("travels").InsertOne(ctx.Context(), *travel); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (r *repository) EditTravel(ctx *fiber.Ctx, id string, data interface{}) error {
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil{
+		return err
+	}
+	query := bson.M{"_id": objectId}
+
+	if result := r.DB.Collection("travels").FindOneAndUpdate(ctx.Context(), query, data); result.Err() != nil {
+		return result.Err()
+	}
 	return nil
 }
