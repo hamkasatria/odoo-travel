@@ -1,0 +1,10 @@
+// Travel struct
+type Travel struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+}
+
+// Travels struct
+type Travelss struct {
+	Travels []Travel `json:"travel"`
+}

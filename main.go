@@ -1,17 +1,20 @@
 package main
 
 import (
-	"log"
+	"odoo-travel/config"
+	"odoo-travel/server"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/go-playground/validator/v10"
 )
 
 func main() {
-	app := fiber.New()
+	validation := validator.New()
+	cfg := config.LoadConfig()
+	dbInit, err := config.MongoDb(cfg)
+	if err != nil {
+		panic(err)
+	}
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Odoo Server Already Run :)")
-	})
-
-	log.Fatal(app.Listen(":3000"))
+	server := server.NewServer(dbInit, validation)
+	server.ListenAndServer(cfg.SvPort)
 }
