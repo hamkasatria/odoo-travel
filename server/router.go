@@ -23,5 +23,6 @@ func (s *ApiServer) registerRouters() {
 	travelv1 := apiv1.Group("/travel")
 	travelv1.Get("", controller.GetListTravel)
 	travelv1.Get("/:ObjectId", controller.GetTravelById)
+	travelv1.Post("", controller.AddTravel)
 
 }

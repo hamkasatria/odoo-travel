@@ -16,30 +16,42 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
+type ResponseOnlyMeta struct {
+	Meta Meta `json:"meta"`
+}
+
 type Meta struct {
 	Message string `json:"message"`
 	Status  int    `json:"status"`
 }
 
 func JsonResponse(ctx *fiber.Ctx, status int, data interface{}) {
-	var ress Response
+	var ress interface{}
 	if status == fiber.StatusOK || status == fiber.StatusCreated {
-		ress = Response{
-			Meta: Meta{
-				Status:  status,
-				Message: "Success",
-			},
-			Data: data,
+		meta := Meta{
+			Status:  status,
+			Message: "Success",
+		}
+
+		if data == nil {
+			ress = ResponseOnlyMeta{
+				Meta: meta,
+			}
+		} else {
+			ress = Response{
+				Meta: meta,
+				Data: data,
+			}
 		}
 
 	} else {
-		ress = Response{
+		ress = ResponseOnlyMeta{
 			Meta: Meta{
 				Status:  status,
 				Message: fmt.Sprintf("%v", data),
 			},
-			Data: nil,
 		}
+
 	}
 	ctx.Status(status).JSON(ress)
 

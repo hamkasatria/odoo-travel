@@ -10,6 +10,7 @@ import (
 type Services interface {
 	GetListTravels(ctx *fiber.Ctx) (*[]models.Travel, error)
 	GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, error)
+	AddTravel(ctx *fiber.Ctx, travel *models.Travel) error
 }
 
 type services struct {
@@ -38,4 +39,12 @@ func (s *services) GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, err
 	}
 
 	return data, nil
+}
+
+func (s *services) AddTravel(ctx *fiber.Ctx, travel *models.Travel) error {
+	if err := s.repo.AddTravel(ctx, travel); err != nil {
+		return err
+	}
+
+	return nil
 }

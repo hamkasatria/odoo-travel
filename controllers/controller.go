@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"odoo-travel/models"
 	"odoo-travel/services"
 
-	ress "odoo-travel/transports"
+	transports "odoo-travel/transports"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -25,16 +26,16 @@ func (c *controller) GetListTravel(ctx *fiber.Ctx) error {
 	result, err := c.srv.GetListTravels(ctx)
 
 	if err != nil {
-		ress.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
+		transports.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
 		return nil
 	}
 
-	trans := &ress.GetListTravels{
+	trans := &transports.GetListTravels{
 		Count: len(*result),
 		List:  *result,
 	}
 
-	ress.JsonResponse(ctx, fiber.StatusOK, trans)
+	transports.JsonResponse(ctx, fiber.StatusOK, trans)
 
 	return nil
 }
@@ -43,15 +44,41 @@ func (c *controller) GetTravelById(ctx *fiber.Ctx) error {
 	id := ctx.Params("ObjectId")
 	result, err := c.srv.GetTravelById(ctx, id)
 	if err != nil {
-		ress.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
+		transports.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
 		return nil
 	}
 
 	if result.ID == "" {
-		ress.JsonResponse(ctx, fiber.StatusNotFound, fiber.ErrNotFound)
+		transports.JsonResponse(ctx, fiber.StatusNotFound, fiber.ErrNotFound)
 		return nil
 	}
 
-	ress.JsonResponse(ctx, fiber.StatusOK, result)
+	transports.JsonResponse(ctx, fiber.StatusOK, result)
+	return nil
+}
+
+func (c *controller) AddTravel(ctx *fiber.Ctx) error {
+
+	travel := new(transports.InsertTravel)
+
+	if err := ctx.BodyParser(travel); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusBadRequest, err.Error())
+		return err
+	}
+
+	if err := c.validator.Struct(travel); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusBadRequest, err.Error())
+		return nil
+	}
+
+	if err := c.srv.AddTravel(ctx, &models.Travel{
+		Name:    travel.Name,
+		Contact: travel.Contact,
+	}); err != nil {
+		transports.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
+		return nil
+	}
+
+	transports.JsonResponse(ctx, fiber.StatusOK, nil)
 	return nil
 }

@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	GetListTravels(ctx *fiber.Ctx) (*[]models.Travel, error)
 	GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, error)
+	AddTravel(ctx *fiber.Ctx, travel *models.Travel)  error
 }
 
 type repository struct {
@@ -47,11 +48,19 @@ func (r *repository) GetTravelById(ctx *fiber.Ctx, id string) (*models.Travel, e
 		return nil, err
 	}
 
-	
 	var travel models.Travel
 	query := bson.M{"_id": objectId}
 
 	r.DB.Collection("travels").FindOne(ctx.Context(), query).Decode(&travel)
-	
+
 	return &travel, nil
+}
+
+func (r *repository) AddTravel(ctx *fiber.Ctx, travel *models.Travel)  error {
+
+	if _, err := r.DB.Collection("travels").InsertOne(ctx.Context(), *travel); err != nil {
+		return err
+	}
+
+	return nil
 }

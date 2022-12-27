@@ -1,11 +1,11 @@
 package transports
 
 type InsertTravel struct {
-	Name    string `json:"Name" validate:"required"`
+	Name    string `json:"name" validate:"required"`
 	Contact string `json:"contact" validate:"required"`
 }
 
-type UpdateBook struct {
-	Name    string `json:"Name"`
-	Contact string `json:"Contact"`
+type UpdateTravel struct {
+	Name    string `json:"name"`
+	Contact string `json:"contact"`
 }
