@@ -1,14 +1,14 @@
 package services
 
 import (
+	"odoo-travel/models"
 	r "odoo-travel/repositories"
-	"odoo-travel/transports"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type Services interface {
-	GetListTravels(ctx *fiber.Ctx) (*transports.GetListTravels, *transports.ResponseError)
+	GetListTravels(ctx *fiber.Ctx) (*[]models.Travel, error)
 }
 
 type services struct {
@@ -21,14 +21,11 @@ func NewService(repo r.Repository) Services {
 	}
 }
 
-func (s *services) GetListTravels(ctx *fiber.Ctx) (*transports.GetListTravels, *transports.ResponseError) {
+func (s *services) GetListTravels(ctx *fiber.Ctx) (*[]models.Travel, error) {
 	data, err := s.repo.GetListTravels(ctx)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
-	trans := &transports.GetListTravels{
-		Count:       len(*data),
-		ListTravels: *data,
-	}
-	return trans, nil
+
+	return data, nil
 }

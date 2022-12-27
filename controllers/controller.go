@@ -3,6 +3,8 @@ package controllers
 import (
 	"odoo-travel/services"
 
+	ress "odoo-travel/transports"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,14 +22,19 @@ func NewController(service services.Services, validator *validator.Validate) *co
 }
 
 func (c *controller) GetListTravel(ctx *fiber.Ctx) error {
-	// fb.Header("Content-Type", "application/json")
 	result, err := c.srv.GetListTravels(ctx)
 
 	if err != nil {
-		ctx.JSON(err)
+		ress.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
 		return nil
 	}
 
-	ctx.JSON(result)
+	trans := &ress.GetListTravels{
+		Count: len(*result),
+		List:  *result,
+	}
+
+	ress.JsonResponse(ctx, fiber.StatusOK, trans)
+
 	return nil
 }
