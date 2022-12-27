@@ -38,3 +38,20 @@ func (c *controller) GetListTravel(ctx *fiber.Ctx) error {
 
 	return nil
 }
+
+func (c *controller) GetTravelById(ctx *fiber.Ctx) error {
+	id := ctx.Params("ObjectId")
+	result, err := c.srv.GetTravelById(ctx, id)
+	if err != nil {
+		ress.JsonResponse(ctx, fiber.StatusUnprocessableEntity, err.Error())
+		return nil
+	}
+
+	if result.ID == "" {
+		ress.JsonResponse(ctx, fiber.StatusNotFound, fiber.ErrNotFound)
+		return nil
+	}
+
+	ress.JsonResponse(ctx, fiber.StatusOK, result)
+	return nil
+}
